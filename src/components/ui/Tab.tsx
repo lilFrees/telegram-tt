@@ -1,15 +1,8 @@
 import type { FC, TeactNode } from '../../lib/teact/teact';
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from '../../lib/teact/teact';
+import React, { useRef } from '../../lib/teact/teact';
 
 import type { MenuItemContextAction } from './ListItem';
 
-import {
-  requestMutation,
-} from '../../lib/fasterdom/fasterdom';
 import buildClassName from '../../util/buildClassName';
 import { MouseButton } from '../../util/windowEnvironment';
 import renderText from '../common/helpers/renderText';
@@ -51,7 +44,6 @@ const Tab: FC<OwnProps> = ({
   isBlocked,
   badgeCount,
   isBadgeActive,
-  previousActiveTab,
   onClick,
   clickArg,
   contextActions,
@@ -59,30 +51,6 @@ const Tab: FC<OwnProps> = ({
 }) => {
   // eslint-disable-next-line no-null/no-null
   const tabRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    // Set initial active state
-    if (isActive && previousActiveTab === undefined && tabRef.current) {
-      tabRef.current!.classList.add(classNames.active);
-    }
-  }, [isActive, previousActiveTab]);
-
-  useEffect(() => {
-    if (!isActive || previousActiveTab === undefined) {
-      return;
-    }
-
-    const tabEl = tabRef.current!;
-    const prevTabEl = tabEl?.parentElement!.children[previousActiveTab];
-    if (!prevTabEl) {
-      // The number of tabs in the parent component has decreased. It is necessary to add the active tab class name.
-      if (isActive && !tabEl.classList.contains(classNames.active)) {
-        requestMutation(() => {
-          tabEl.classList.add(classNames.active);
-        });
-      }
-    }
-  }, [isActive, previousActiveTab]);
 
   const {
     contextMenuAnchor,
@@ -121,6 +89,7 @@ const Tab: FC<OwnProps> = ({
       className={buildClassName(
         'Tab',
         onClick && 'Tab--interactive',
+        isActive && classNames.active,
         className,
       )}
       onClick={handleClick}
@@ -142,7 +111,6 @@ const Tab: FC<OwnProps> = ({
         <Icon name="folder-badge" className="Tab--icon" />
         {typeof title === 'string' ? renderText(title) : title}
         {isBlocked && <Icon name="lock-badge" className="blocked" />}
-        <i className="platform" />
       </span>
 
       {contextActions && contextMenuAnchor !== undefined && (

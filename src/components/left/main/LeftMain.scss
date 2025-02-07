@@ -14,7 +14,13 @@
   .ChatFolders {
     height: 100%;
     display: flex;
+    // flex-direction: column;
     overflow: hidden;
+    flex-wrap: wrap;
+
+    #StoryRibbon {
+      flex-basis: 100%;
+    }
 
     .tabs-placeholder {
       height: 2.625rem;

@@ -1,10 +1,17 @@
 import type { FC } from '../../../lib/teact/teact';
 import React, {
-  memo, useEffect, useMemo, useRef,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
 } from '../../../lib/teact/teact';
 import { getActions, getGlobal, withGlobal } from '../../../global';
 
-import type { ApiChatFolder, ApiChatlistExportedInvite, ApiSession } from '../../../api/types';
+import type {
+  ApiChatFolder,
+  ApiChatlistExportedInvite,
+  ApiSession,
+} from '../../../api/types';
 import type { GlobalState } from '../../../global/types';
 import type { FolderEditDispatch } from '../../../hooks/reducers/useFoldersReducer';
 import type { LeftColumnContent, SettingsScreens } from '../../../types';
@@ -12,7 +19,10 @@ import type { MenuItemContextAction } from '../../ui/ListItem';
 import type { TabWithProperties } from '../../ui/TabList';
 
 import { ALL_FOLDER_ID } from '../../../config';
-import { selectCanShareFolder, selectTabState } from '../../../global/selectors';
+import {
+  selectCanShareFolder,
+  selectTabState,
+} from '../../../global/selectors';
 import { selectCurrentLimit } from '../../../global/selectors/limits';
 import buildClassName from '../../../util/buildClassName';
 import captureEscKeyListener from '../../../util/captureEscKeyListener';
@@ -42,7 +52,7 @@ type OwnProps = {
   content: LeftColumnContent;
   onReset: NoneToVoidFunction;
   shouldSkipTransition?: boolean;
-  shouldHideSearch?:boolean;
+  shouldHideSearch?: boolean;
   onSelectArchived: NoneToVoidFunction;
   onSelectContacts: NoneToVoidFunction;
   onSelectSettings: NoneToVoidFunction;
@@ -129,7 +139,12 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
   const allChatsFolder: ApiChatFolder = useMemo(() => {
     return {
       id: ALL_FOLDER_ID,
-      title: { text: orderedFolderIds?.[0] === ALL_FOLDER_ID ? lang('FilterAllChatsShort') : lang('FilterAllChats') },
+      title: {
+        text:
+          orderedFolderIds?.[0] === ALL_FOLDER_ID
+            ? lang('FilterAllChatsShort')
+            : lang('FilterAllChats'),
+      },
       includedChatIds: MEMO_EMPTY_ARRAY,
       excludedChatIds: MEMO_EMPTY_ARRAY,
     } satisfies ApiChatFolder;
@@ -137,17 +152,21 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
 
   const displayedFolders = useMemo(() => {
     return orderedFolderIds
-      ? orderedFolderIds.map((id) => {
-        if (id === ALL_FOLDER_ID) {
-          return allChatsFolder;
-        }
+      ? orderedFolderIds
+        .map((id) => {
+          if (id === ALL_FOLDER_ID) {
+            return allChatsFolder;
+          }
 
-        return chatFoldersById[id] || {};
-      }).filter(Boolean)
+          return chatFoldersById[id] || {};
+        })
+        .filter(Boolean)
       : undefined;
   }, [chatFoldersById, allChatsFolder, orderedFolderIds]);
 
-  const allChatsFolderIndex = displayedFolders?.findIndex((folder) => folder.id === ALL_FOLDER_ID);
+  const allChatsFolderIndex = displayedFolders?.findIndex(
+    (folder) => folder.id === ALL_FOLDER_ID,
+  );
   const isInAllChatsFolder = allChatsFolderIndex === activeChatFolder;
   const isInFirstFolder = FIRST_FOLDER_INDEX === activeChatFolder;
 
@@ -168,7 +187,10 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
           title: lang('FilterShare'),
           icon: 'link',
           handler: () => {
-            const chatListCount = Object.values(chatFoldersById).reduce((acc, el) => acc + (el.isChatList ? 1 : 0), 0);
+            const chatListCount = Object.values(chatFoldersById).reduce(
+              (acc, el) => acc + (el.isChatList ? 1 : 0),
+              0,
+            );
             if (chatListCount >= maxChatLists && !folder.isChatList) {
               openLimitReachedModal({
                 limit: 'chatlistJoined',
@@ -224,12 +246,21 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
       } satisfies TabWithProperties;
     });
   }, [
-    displayedFolders, maxFolders, folderCountersById, lang, chatFoldersById, maxChatLists, folderInvitesById,
+    displayedFolders,
+    maxFolders,
+    folderCountersById,
+    lang,
+    chatFoldersById,
+    maxChatLists,
+    folderInvitesById,
     maxFolderInvites,
   ]);
 
   const handleSwitchTab = useLastCallback((index: number) => {
-    setActiveChatFolder({ activeChatFolder: index }, { forceOnHeavyAnimation: true });
+    setActiveChatFolder(
+      { activeChatFolder: index },
+      { forceOnHeavyAnimation: true },
+    );
   });
 
   // Prevent `activeTab` pointing at non-existing folder after update
@@ -250,34 +281,50 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
 
     return captureEvents(transitionRef.current!, {
       selectorToPreventScroll: '.chat-list',
-      onSwipe: ((e, direction) => {
+      onSwipe: (e, direction) => {
         if (direction === SwipeDirection.Left) {
           setActiveChatFolder(
-            { activeChatFolder: Math.min(activeChatFolder + 1, folderTabs.length - 1) },
+            {
+              activeChatFolder: Math.min(
+                activeChatFolder + 1,
+                folderTabs.length - 1,
+              ),
+            },
             { forceOnHeavyAnimation: true },
           );
           return true;
         } else if (direction === SwipeDirection.Right) {
-          setActiveChatFolder({ activeChatFolder: Math.max(0, activeChatFolder - 1) }, { forceOnHeavyAnimation: true });
+          setActiveChatFolder(
+            { activeChatFolder: Math.max(0, activeChatFolder - 1) },
+            { forceOnHeavyAnimation: true },
+          );
           return true;
         }
 
         return false;
-      }),
+      },
     });
   }, [activeChatFolder, folderTabs, isForumPanelOpen, setActiveChatFolder]);
 
   const isNotInFirstFolderRef = useRef();
   isNotInFirstFolderRef.current = !isInFirstFolder;
-  useEffect(() => (isNotInFirstFolderRef.current ? captureEscKeyListener(() => {
-    if (isNotInFirstFolderRef.current) {
-      setActiveChatFolder({ activeChatFolder: FIRST_FOLDER_INDEX });
-    }
-  }) : undefined), [activeChatFolder, setActiveChatFolder]);
+  useEffect(
+    () => (isNotInFirstFolderRef.current
+      ? captureEscKeyListener(() => {
+        if (isNotInFirstFolderRef.current) {
+          setActiveChatFolder({ activeChatFolder: FIRST_FOLDER_INDEX });
+        }
+      })
+      : undefined),
+    [activeChatFolder, setActiveChatFolder],
+  );
 
   useHistoryBack({
     isActive: !isInFirstFolder,
-    onBack: () => setActiveChatFolder({ activeChatFolder: FIRST_FOLDER_INDEX }, { forceOnHeavyAnimation: true }),
+    onBack: () => setActiveChatFolder(
+      { activeChatFolder: FIRST_FOLDER_INDEX },
+      { forceOnHeavyAnimation: true },
+    ),
   });
 
   useEffect(() => {
@@ -294,7 +341,10 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
         const folder = Number(digit) - 1;
         if (folder > folderTabs.length - 1) return;
 
-        setActiveChatFolder({ activeChatFolder: folder }, { forceOnHeavyAnimation: true });
+        setActiveChatFolder(
+          { activeChatFolder: folder },
+          { forceOnHeavyAnimation: true },
+        );
         e.preventDefault();
       }
     };
@@ -306,18 +356,16 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
     };
   }, [currentUserId, folderTabs, openChat, setActiveChatFolder]);
 
-  const {
-    ref: placeholderRef,
-    shouldRender: shouldRenderPlaceholder,
-  } = useShowTransition({
+  const { ref: placeholderRef, shouldRender: shouldRenderPlaceholder } = useShowTransition({
     isOpen: !orderedFolderIds,
     noMountTransition: true,
     withShouldRender: true,
   });
 
   function renderCurrentTab(isActive: boolean) {
-    const activeFolder = Object.values(chatFoldersById)
-      .find(({ id }) => id === folderTabs![activeChatFolder].id);
+    const activeFolder = Object.values(chatFoldersById).find(
+      ({ id }) => id === folderTabs![activeChatFolder].id,
+    );
     const isFolder = activeFolder && !isInAllChatsFolder;
 
     return (
@@ -329,7 +377,9 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
         foldersDispatch={foldersDispatch}
         onSettingsScreenSelect={onSettingsScreenSelect}
         onLeftColumnContentChange={onLeftColumnContentChange}
-        canDisplayArchive={(hasArchivedChats || hasArchivedStories) && !archiveSettings.isHidden}
+        canDisplayArchive={
+          (hasArchivedChats || hasArchivedStories) && !archiveSettings.isHidden
+        }
         archiveSettings={archiveSettings}
         sessions={sessions}
       />
@@ -343,11 +393,15 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
       ref={ref}
       className={buildClassName(
         'ChatFolders',
-        shouldRenderFolders && shouldHideFolderTabs && 'ChatFolders--tabs-hidden',
+        shouldRenderFolders
+          && shouldHideFolderTabs
+          && 'ChatFolders--tabs-hidden',
         shouldRenderStoryRibbon && 'with-story-ribbon',
       )}
     >
-      {shouldRenderStoryRibbon && <StoryRibbon isClosing={isStoryRibbonClosing} />}
+      {shouldRenderStoryRibbon && (
+        <StoryRibbon isClosing={isStoryRibbonClosing} />
+      )}
       {shouldRenderFolders ? (
         <TabList
           contextRootElementSelector="#LeftColumn"
@@ -367,7 +421,13 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
       ) : undefined}
       <Transition
         ref={transitionRef}
-        name={shouldSkipHistoryAnimations ? 'none' : lang.isRtl ? 'slideOptimizedRtl' : 'slideOptimized'}
+        name={
+          shouldSkipHistoryAnimations
+            ? 'none'
+            : lang.isRtl
+              ? 'slideOptimizedRtl'
+              : 'slideOptimized'
+        }
         activeKey={activeChatFolder}
         renderCount={shouldRenderFolders ? folderTabs.length : undefined}
       >
@@ -377,8 +437,8 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
   );
 };
 
-export default memo(withGlobal<OwnProps>(
-  (global): StateProps => {
+export default memo(
+  withGlobal<OwnProps>((global): StateProps => {
     const {
       chatFolders: {
         byId: chatFoldersById,
@@ -386,23 +446,19 @@ export default memo(withGlobal<OwnProps>(
         invites: folderInvitesById,
       },
       chats: {
-        listIds: {
-          archived,
-        },
+        listIds: { archived },
       },
       stories: {
-        orderedPeerIds: {
-          archived: archivedStories,
-        },
+        orderedPeerIds: { archived: archivedStories },
       },
-      activeSessions: {
-        byHash: sessions,
-      },
+      activeSessions: { byHash: sessions },
       currentUserId,
       archiveSettings,
     } = global;
     const { shouldSkipHistoryAnimations, activeChatFolder } = selectTabState(global);
-    const { storyViewer: { isRibbonShown: isStoryRibbonShown } } = selectTabState(global);
+    const {
+      storyViewer: { isRibbonShown: isStoryRibbonShown },
+    } = selectTabState(global);
 
     return {
       chatFoldersById,
@@ -420,5 +476,5 @@ export default memo(withGlobal<OwnProps>(
       isStoryRibbonShown,
       sessions,
     };
-  },
-)(ChatFolders));
+  })(ChatFolders),
+);
