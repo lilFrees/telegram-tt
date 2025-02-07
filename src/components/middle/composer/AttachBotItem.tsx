@@ -22,8 +22,8 @@ type OwnProps = {
   chatId?: string;
   threadId?: ThreadId;
   canShowNew?: boolean;
-  onMenuOpened: VoidFunction;
-  onMenuClosed: VoidFunction;
+  onMenuOpened?: VoidFunction;
+  onMenuClosed?: VoidFunction;
 };
 
 const AttachBotItem: FC<OwnProps> = ({
@@ -51,7 +51,7 @@ const AttachBotItem: FC<OwnProps> = ({
     e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
     setMenuPosition({ x: rect.right, y: rect.bottom });
-    onMenuOpened();
+    onMenuOpened!();
     openMenu();
   });
 
@@ -72,7 +72,7 @@ const AttachBotItem: FC<OwnProps> = ({
 
   const handleCloseMenu = useLastCallback(() => {
     closeMenu();
-    onMenuClosed();
+    onMenuClosed!();
   });
 
   const handleCloseAnimationEnd = useLastCallback(() => {

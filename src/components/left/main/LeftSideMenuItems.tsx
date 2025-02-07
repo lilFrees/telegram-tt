@@ -36,11 +36,11 @@ import Switcher from '../../ui/Switcher';
 import Toggle from '../../ui/Toggle';
 
 type OwnProps = {
-  onSelectSettings: NoneToVoidFunction;
-  onSelectContacts: NoneToVoidFunction;
-  onSelectArchived: NoneToVoidFunction;
-  onBotMenuOpened: NoneToVoidFunction;
-  onBotMenuClosed: NoneToVoidFunction;
+  onSelectSettings?: NoneToVoidFunction;
+  onSelectContacts?: NoneToVoidFunction;
+  onSelectArchived?: NoneToVoidFunction;
+  onBotMenuOpened?: NoneToVoidFunction;
+  onBotMenuClosed?: NoneToVoidFunction;
 };
 
 type StateProps = {

@@ -7,6 +7,7 @@ import buildClassName from '../../util/buildClassName';
 import { MouseButton } from '../../util/windowEnvironment';
 import renderText from '../common/helpers/renderText';
 
+import useAppLayout from '../../hooks/useAppLayout';
 import useContextMenuHandlers from '../../hooks/useContextMenuHandlers';
 import { useFastClick } from '../../hooks/useFastClick';
 import useLastCallback from '../../hooks/useLastCallback';
@@ -84,6 +85,8 @@ const Tab: FC<OwnProps> = ({
     .querySelector('.Tab-context-menu .bubble'));
   const getLayout = useLastCallback(() => ({ withPortal: true }));
 
+  const { isMobile } = useAppLayout();
+
   return (
     <div
       className={buildClassName(
@@ -91,6 +94,7 @@ const Tab: FC<OwnProps> = ({
         onClick && 'Tab--interactive',
         isActive && classNames.active,
         className,
+        isMobile && 'mobile',
       )}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
@@ -108,7 +112,9 @@ const Tab: FC<OwnProps> = ({
             {badgeCount}
           </span>
         )}
-        <Icon name="folder-badge" className="Tab--icon" />
+        {contextRootElementSelector === '#LeftColumn' && (
+          <Icon name="folder-badge" className="Tab--icon" />
+        )}
         {typeof title === 'string' ? renderText(title) : title}
         {isBlocked && <Icon name="lock-badge" className="blocked" />}
       </span>

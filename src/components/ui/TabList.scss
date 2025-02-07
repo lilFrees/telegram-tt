@@ -7,14 +7,19 @@
   flex-wrap: nowrap;
   box-shadow: 0 2px 2px var(--color-light-shadow);
   background-color: var(--color-background);
-
+  overflow-y: auto;
+  flex-basis: 4.4rem;
   font-size: 1rem;
+
+  &.mobile {
+    flex-direction: column;
+  }
 
   scrollbar-width: none;
   scrollbar-color: rgba(0, 0, 0, 0);
 
   &::-webkit-scrollbar {
-    width: 0;
+    height: 0;
   }
 
   &::-webkit-scrollbar-thumb {
