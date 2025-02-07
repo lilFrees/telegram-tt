@@ -4,22 +4,19 @@
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
   flex-wrap: nowrap;
   box-shadow: 0 2px 2px var(--color-light-shadow);
   background-color: var(--color-background);
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
 
   font-size: 1rem;
-
-  padding-inline: 0.5rem;
 
   scrollbar-width: none;
   scrollbar-color: rgba(0, 0, 0, 0);
 
   &::-webkit-scrollbar {
-    height: 0;
+    width: 0;
   }
 
   &::-webkit-scrollbar-thumb {

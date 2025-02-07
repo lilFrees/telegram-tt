@@ -1,9 +1,16 @@
 import type { FC, TeactNode } from '../../lib/teact/teact';
-import React, { useEffect, useLayoutEffect, useRef } from '../../lib/teact/teact';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from '../../lib/teact/teact';
 
 import type { MenuItemContextAction } from './ListItem';
 
-import { requestForcedReflow, requestMutation } from '../../lib/fasterdom/fasterdom';
+import {
+  requestForcedReflow,
+  requestMutation,
+} from '../../lib/fasterdom/fasterdom';
 import buildClassName from '../../util/buildClassName';
 import forceReflow from '../../util/forceReflow';
 import { MouseButton } from '../../util/windowEnvironment';
@@ -83,7 +90,8 @@ const Tab: FC<OwnProps> = ({
     const prevPlatformEl = prevTabEl.querySelector<HTMLElement>('.platform')!;
 
     // We move and resize the platform, so it repeats the position and size of the previous one
-    const shiftLeft = prevPlatformEl.parentElement!.offsetLeft - platformEl.parentElement!.offsetLeft;
+    const shiftLeft = prevPlatformEl.parentElement!.offsetLeft
+      - platformEl.parentElement!.offsetLeft;
     const scaleFactor = prevPlatformEl.clientWidth / platformEl.clientWidth;
 
     requestMutation(() => {
@@ -106,44 +114,62 @@ const Tab: FC<OwnProps> = ({
   }, [isActive, previousActiveTab]);
 
   const {
-    contextMenuAnchor, handleContextMenu, handleBeforeContextMenu, handleContextMenuClose,
-    handleContextMenuHide, isContextMenuOpen,
+    contextMenuAnchor,
+    handleContextMenu,
+    handleBeforeContextMenu,
+    handleContextMenuClose,
+    handleContextMenuHide,
+    isContextMenuOpen,
   } = useContextMenuHandlers(tabRef, !contextActions);
 
-  const { handleClick, handleMouseDown } = useFastClick((e: React.MouseEvent<HTMLDivElement>) => {
-    if (contextActions && (e.button === MouseButton.Secondary || !onClick)) {
-      handleBeforeContextMenu(e);
-    }
+  const { handleClick, handleMouseDown } = useFastClick(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (contextActions && (e.button === MouseButton.Secondary || !onClick)) {
+        handleBeforeContextMenu(e);
+      }
 
-    if (e.type === 'mousedown' && e.button !== MouseButton.Main) {
-      return;
-    }
+      if (e.type === 'mousedown' && e.button !== MouseButton.Main) {
+        return;
+      }
 
-    onClick?.(clickArg!);
-  });
+      onClick?.(clickArg!);
+    },
+  );
 
   const getTriggerElement = useLastCallback(() => tabRef.current);
-  const getRootElement = useLastCallback(
-    () => (contextRootElementSelector ? tabRef.current!.closest(contextRootElementSelector) : document.body),
-  );
-  const getMenuElement = useLastCallback(
-    () => document.querySelector('#portals')!.querySelector('.Tab-context-menu .bubble'),
-  );
+  const getRootElement = useLastCallback(() => (contextRootElementSelector
+    ? tabRef.current!.closest(contextRootElementSelector)
+    : document.body));
+  const getMenuElement = useLastCallback(() => document
+    .querySelector('#portals')!
+    .querySelector('.Tab-context-menu .bubble'));
   const getLayout = useLastCallback(() => ({ withPortal: true }));
 
   return (
     <div
-      className={buildClassName('Tab', onClick && 'Tab--interactive', className)}
+      className={buildClassName(
+        'Tab',
+        onClick && 'Tab--interactive',
+        className,
+      )}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onContextMenu={handleContextMenu}
       ref={tabRef}
     >
       <span className="Tab_inner">
-        {typeof title === 'string' ? renderText(title) : title}
         {Boolean(badgeCount) && (
-          <span className={buildClassName('badge', isBadgeActive && classNames.badgeActive)}>{badgeCount}</span>
+          <span
+            className={buildClassName(
+              'badge',
+              isBadgeActive && classNames.badgeActive,
+            )}
+          >
+            {badgeCount}
+          </span>
         )}
+        <Icon name="folder-badge" className="Tab--icon" />
+        {typeof title === 'string' ? renderText(title) : title}
         {isBlocked && <Icon name="lock-badge" className="blocked" />}
         <i className="platform" />
       </span>
@@ -162,21 +188,19 @@ const Tab: FC<OwnProps> = ({
           onCloseAnimationEnd={handleContextMenuHide}
           withPortal
         >
-          {contextActions.map((action) => (
-            ('isSeparator' in action) ? (
-              <MenuSeparator key={action.key || 'separator'} />
-            ) : (
-              <MenuItem
-                key={action.title}
-                icon={action.icon}
-                destructive={action.destructive}
-                disabled={!action.handler}
-                onClick={action.handler}
-              >
-                {action.title}
-              </MenuItem>
-            )
-          ))}
+          {contextActions.map((action) => ('isSeparator' in action ? (
+            <MenuSeparator key={action.key || 'separator'} />
+          ) : (
+            <MenuItem
+              key={action.title}
+              icon={action.icon}
+              destructive={action.destructive}
+              disabled={!action.handler}
+              onClick={action.handler}
+            >
+              {action.title}
+            </MenuItem>
+          )))}
         </Menu>
       )}
     </div>
