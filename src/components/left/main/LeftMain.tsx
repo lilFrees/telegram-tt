@@ -196,11 +196,18 @@ const LeftMain: FC<OwnProps> = ({
             case LeftColumnContent.ChatList:
               return (
                 <ChatFolders
+                  content={content}
                   shouldHideFolderTabs={isForumPanelVisible}
                   onSettingsScreenSelect={onSettingsScreenSelect}
                   onLeftColumnContentChange={onContentChange}
                   foldersDispatch={foldersDispatch}
                   isForumPanelOpen={isForumPanelVisible}
+                  onReset={onReset}
+                  shouldSkipTransition={shouldSkipTransition}
+                  shouldHideSearch={isForumPanelVisible}
+                  onSelectArchived={handleSelectArchived}
+                  onSelectContacts={handleSelectContacts}
+                  onSelectSettings={handleSelectSettings}
                 />
               );
             case LeftColumnContent.GlobalSearch:

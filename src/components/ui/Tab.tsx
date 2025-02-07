@@ -8,11 +8,9 @@ import React, {
 import type { MenuItemContextAction } from './ListItem';
 
 import {
-  requestForcedReflow,
   requestMutation,
 } from '../../lib/fasterdom/fasterdom';
 import buildClassName from '../../util/buildClassName';
-import forceReflow from '../../util/forceReflow';
 import { MouseButton } from '../../util/windowEnvironment';
 import renderText from '../common/helpers/renderText';
 
@@ -75,7 +73,7 @@ const Tab: FC<OwnProps> = ({
     }
 
     const tabEl = tabRef.current!;
-    const prevTabEl = tabEl.parentElement!.children[previousActiveTab];
+    const prevTabEl = tabEl?.parentElement!.children[previousActiveTab];
     if (!prevTabEl) {
       // The number of tabs in the parent component has decreased. It is necessary to add the active tab class name.
       if (isActive && !tabEl.classList.contains(classNames.active)) {
@@ -83,34 +81,7 @@ const Tab: FC<OwnProps> = ({
           tabEl.classList.add(classNames.active);
         });
       }
-      return;
     }
-
-    const platformEl = tabEl.querySelector<HTMLElement>('.platform')!;
-    const prevPlatformEl = prevTabEl.querySelector<HTMLElement>('.platform')!;
-
-    // We move and resize the platform, so it repeats the position and size of the previous one
-    const shiftLeft = prevPlatformEl.parentElement!.offsetLeft
-      - platformEl.parentElement!.offsetLeft;
-    const scaleFactor = prevPlatformEl.clientWidth / platformEl.clientWidth;
-
-    requestMutation(() => {
-      prevPlatformEl.classList.remove('animate');
-      platformEl.classList.remove('animate');
-      platformEl.style.transform = `translate3d(${shiftLeft}px, 0, 0) scale3d(${scaleFactor}, 1, 1)`;
-
-      requestForcedReflow(() => {
-        forceReflow(platformEl);
-
-        return () => {
-          platformEl.classList.add('animate');
-          platformEl.style.transform = 'none';
-
-          prevTabEl.classList.remove(classNames.active);
-          tabEl.classList.add(classNames.active);
-        };
-      });
-    });
   }, [isActive, previousActiveTab]);
 
   const {

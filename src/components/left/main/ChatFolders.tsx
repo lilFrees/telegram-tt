@@ -39,6 +39,13 @@ type OwnProps = {
   onLeftColumnContentChange: (content: LeftColumnContent) => void;
   shouldHideFolderTabs?: boolean;
   isForumPanelOpen?: boolean;
+  content: LeftColumnContent;
+  onReset: NoneToVoidFunction;
+  shouldSkipTransition?: boolean;
+  shouldHideSearch?:boolean;
+  onSelectArchived: NoneToVoidFunction;
+  onSelectContacts: NoneToVoidFunction;
+  onSelectSettings: NoneToVoidFunction;
 };
 
 type StateProps = {
@@ -81,6 +88,13 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
   archiveSettings,
   isStoryRibbonShown,
   sessions,
+  content,
+  onReset,
+  shouldSkipTransition,
+  shouldHideSearch,
+  onSelectArchived,
+  onSelectContacts,
+  onSelectSettings,
 }) => {
   const {
     loadChatFolders,
@@ -340,6 +354,13 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
           tabs={folderTabs}
           activeTab={activeChatFolder}
           onSwitchTab={handleSwitchTab}
+          content={content}
+          onReset={onReset}
+          shouldSkipTransition={Boolean(shouldSkipTransition)}
+          shouldHideSearch={Boolean(shouldHideSearch)}
+          onSelectArchived={onSelectArchived}
+          onSelectContacts={onSelectContacts}
+          onSelectSettings={onSelectSettings}
         />
       ) : shouldRenderPlaceholder ? (
         <div ref={placeholderRef} className="tabs-placeholder" />

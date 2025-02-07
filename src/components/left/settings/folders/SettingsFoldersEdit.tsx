@@ -353,6 +353,8 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
           </div>
         </div>
 
+        {/* <EmojiTooltipAsync isOpen customEmojis={} /> */}
+
         {!isOnlyInvites && (
           <div className="settings-item pt-3">
             {state.error && state.error === ERROR_NO_CHATS && (

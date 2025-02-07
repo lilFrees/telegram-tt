@@ -1,16 +1,31 @@
+// import { useMemo } from 'react';
 import type { FC, TeactNode } from '../../lib/teact/teact';
 import React, { memo, useEffect, useRef } from '../../lib/teact/teact';
 
+import type { LeftColumnContent } from '../../types';
 import type { MenuItemContextAction } from './ListItem';
 
+import { APP_NAME, DEBUG, IS_BETA } from '../../config';
 import animateHorizontalScroll from '../../util/animateHorizontalScroll';
 import buildClassName from '../../util/buildClassName';
-import { IS_ANDROID, IS_IOS } from '../../util/windowEnvironment';
+import {
+  IS_ANDROID,
+  IS_ELECTRON,
+  IS_IOS,
+  IS_MAC_OS,
+} from '../../util/windowEnvironment';
 
-import useHorizontalScroll from '../../hooks/useHorizontalScroll';
+import useTopOverscroll from '../../hooks/scroll/useTopOverscroll';
+// import useAppLayout from '../../hooks/useAppLayout';
+import useFlag from '../../hooks/useFlag';
 import useOldLang from '../../hooks/useOldLang';
 import usePreviousDeprecated from '../../hooks/usePreviousDeprecated';
+import { useFullscreenStatus } from '../../hooks/window/useFullscreen';
+import useLeftHeaderButtonRtlForumTransition from '../left/main/hooks/useLeftHeaderButtonRtlForumTransition';
 
+import LeftSideMenuItems from '../left/main/LeftSideMenuItems';
+// import Button from './Button';
+import DropdownMenu from './DropdownMenu';
 import Tab from './Tab';
 
 import './TabList.scss';
@@ -31,6 +46,13 @@ type OwnProps = {
   tabClassName?: string;
   onSwitchTab: (index: number) => void;
   contextRootElementSelector?: string;
+  content: LeftColumnContent;
+  onReset: NoneToVoidFunction;
+  shouldSkipTransition: boolean;
+  shouldHideSearch: boolean;
+  onSelectArchived: NoneToVoidFunction;
+  onSelectContacts: NoneToVoidFunction;
+  onSelectSettings: NoneToVoidFunction;
 };
 
 const TAB_SCROLL_THRESHOLD_PX = 16;
@@ -38,14 +60,41 @@ const TAB_SCROLL_THRESHOLD_PX = 16;
 const SCROLL_DURATION = IS_IOS ? 450 : IS_ANDROID ? 400 : 300;
 
 const TabList: FC<OwnProps> = ({
-  tabs, activeTab, onSwitchTab,
-  contextRootElementSelector, className, tabClassName,
+  tabs,
+  activeTab,
+  onSwitchTab,
+  contextRootElementSelector,
+  className,
+  tabClassName,
+  // content,
+  // onReset,
+  // shouldSkipTransition,
+  shouldHideSearch,
+  onSelectArchived,
+  onSelectContacts,
+  onSelectSettings,
 }) => {
   // eslint-disable-next-line no-null/no-null
   const containerRef = useRef<HTMLDivElement>(null);
   const previousActiveTab = usePreviousDeprecated(activeTab);
+  // const hasMenu = content === LeftColumnContent.ChatList;
+  // const { isMobile } = useAppLayout();
+  const lang = useOldLang();
+  const isFullscreen = useFullscreenStatus();
+  const [isBotMenuOpen, markBotMenuOpen, unmarkBotMenuOpen] = useFlag();
 
-  useHorizontalScroll(containerRef, undefined, true);
+  const versionString = IS_BETA
+    ? `${APP_VERSION} Beta (${APP_REVISION})`
+    : DEBUG
+      ? APP_REVISION
+      : APP_VERSION;
+
+  const {
+    shouldDisableDropdownMenuTransitionRef,
+    handleDropdownMenuTransitionEnd,
+  } = useLeftHeaderButtonRtlForumTransition(shouldHideSearch);
+
+  useTopOverscroll(containerRef, undefined, undefined, true);
 
   // Scroll container to place active tab in the center
   useEffect(() => {
@@ -55,13 +104,18 @@ const TabList: FC<OwnProps> = ({
       return;
     }
 
-    const activeTabElement = container.childNodes[activeTab] as HTMLElement | null;
+    const activeTabElement = container.childNodes[
+      activeTab
+    ] as HTMLElement | null;
     if (!activeTabElement) {
       return;
     }
 
-    const { offsetLeft: activeTabOffsetLeft, offsetWidth: activeTabOffsetWidth } = activeTabElement;
-    const newLeft = activeTabOffsetLeft - (offsetWidth / 2) + (activeTabOffsetWidth / 2);
+    const {
+      offsetLeft: activeTabOffsetLeft,
+      offsetWidth: activeTabOffsetWidth,
+    } = activeTabElement;
+    const newLeft = activeTabOffsetLeft - offsetWidth / 2 + activeTabOffsetWidth / 2;
 
     // Prevent scrolling by only a couple of pixels, which doesn't look smooth
     if (Math.abs(newLeft - scrollLeft) < TAB_SCROLL_THRESHOLD_PX) {
@@ -71,7 +125,30 @@ const TabList: FC<OwnProps> = ({
     animateHorizontalScroll(container, newLeft, SCROLL_DURATION);
   }, [activeTab]);
 
-  const lang = useOldLang();
+  // const MainButton: FC<{ onTrigger: () => void; isOpen?: boolean }> = useMemo(() => {
+  //   return ({ onTrigger, isOpen }) => (
+  //     <Button
+  //       round
+  //       ripple={hasMenu && !isMobile}
+  //       size="smaller"
+  //       color="translucent"
+  //       className={isOpen ? 'active' : ''}
+  //       // eslint-disable-next-line react/jsx-no-bind
+  //       onClick={hasMenu ? onTrigger : () => onReset()}
+  //       ariaLabel={
+  //         hasMenu ? lang('AccDescrOpenMenu2') : 'Return to chat list'
+  //       }
+  //     >
+  //       <div
+  //         className={buildClassName(
+  //           'animated-menu-icon',
+  //           !hasMenu && 'state-back',
+  //           shouldSkipTransition && 'no-animation',
+  //         )}
+  //       />
+  //     </Button>
+  //   );
+  // }, [hasMenu, isMobile, lang, onReset, shouldSkipTransition]);
 
   return (
     <div
@@ -79,6 +156,34 @@ const TabList: FC<OwnProps> = ({
       ref={containerRef}
       dir={lang.isRtl ? 'rtl' : undefined}
     >
+      <DropdownMenu
+        // trigger={MainButton}
+        footer={`${APP_NAME} ${versionString}`}
+        className={buildClassName(
+          'main-menu',
+          lang.isRtl && 'rtl',
+          shouldHideSearch && lang.isRtl && 'right-aligned',
+          shouldDisableDropdownMenuTransitionRef.current
+            && lang.isRtl
+            && 'disable-transition',
+        )}
+        forceOpen={isBotMenuOpen}
+        positionX={shouldHideSearch && lang.isRtl ? 'right' : 'left'}
+        transformOriginX={
+          IS_ELECTRON && IS_MAC_OS && !isFullscreen ? 90 : undefined
+        }
+        onTransitionEnd={
+          lang.isRtl ? handleDropdownMenuTransitionEnd : undefined
+        }
+      >
+        <LeftSideMenuItems
+          onSelectArchived={onSelectArchived}
+          onSelectContacts={onSelectContacts}
+          onSelectSettings={onSelectSettings}
+          onBotMenuOpened={markBotMenuOpen}
+          onBotMenuClosed={unmarkBotMenuOpen}
+        />
+      </DropdownMenu>
       {tabs.map((tab, i) => (
         <Tab
           key={tab.id}
