@@ -34,10 +34,12 @@ import AnimatedIcon from '../../../common/AnimatedIcon';
 import GroupChatInfo from '../../../common/GroupChatInfo';
 import Icon from '../../../common/icons/Icon';
 import PrivateChatInfo from '../../../common/PrivateChatInfo';
+import EmojiPicker from '../../../middle/composer/EmojiPicker';
 import FloatingActionButton from '../../../ui/FloatingActionButton';
 import InputText from '../../../ui/InputText';
 import ListItem from '../../../ui/ListItem';
 import Spinner from '../../../ui/Spinner';
+import Transition from '../../../ui/Transition';
 
 type OwnProps = {
   state: FoldersState;
@@ -351,6 +353,19 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
               {Icon({ name: 'folder-badge' })}
             </button>
           </div>
+        </div>
+        <div className="SymbolMenu-main">
+          {(true || true) && (
+            <Transition
+              activeKey={2}
+              name="slide"
+            >
+              <EmojiPicker
+                className="picker-tab"
+                onEmojiSelect={(_emoji, _name) => {}}
+              />
+            </Transition>
+          )}
         </div>
 
         {/* <EmojiTooltipAsync isOpen customEmojis={} /> */}

@@ -1,6 +1,10 @@
 import type { FC } from '../../../lib/teact/teact';
 import React, {
-  memo, useEffect, useLayoutEffect, useRef, useState,
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
 } from '../../../lib/teact/teact';
 import { withGlobal } from '../../../global';
 
@@ -10,7 +14,10 @@ import type { ThreadId } from '../../../types';
 import type { MenuPositionOptions } from '../../ui/Menu';
 
 import { requestMutation } from '../../../lib/fasterdom/fasterdom';
-import { selectIsContextMenuTranslucent, selectTabState } from '../../../global/selectors';
+import {
+  selectIsContextMenuTranslucent,
+  selectTabState,
+} from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import { IS_TOUCH_ENV } from '../../../util/windowEnvironment';
 
@@ -29,7 +36,10 @@ import Transition from '../../ui/Transition';
 import EmojiPicker from './EmojiPicker';
 import GifPicker from './GifPicker';
 import StickerPicker from './StickerPicker';
-import SymbolMenuFooter, { SYMBOL_MENU_TAB_TITLES, SymbolMenuTabs } from './SymbolMenuFooter';
+import SymbolMenuFooter, {
+  SYMBOL_MENU_TAB_TITLES,
+  SymbolMenuTabs,
+} from './SymbolMenuFooter';
 
 import './SymbolMenu.scss';
 
@@ -37,7 +47,7 @@ const ANIMATION_DURATION = 350;
 const STICKERS_TAB_INDEX = 2;
 
 export type OwnProps = {
-  chatId: string;
+  chatId?: string;
   threadId?: ThreadId;
   isOpen: boolean;
   canSendStickers?: boolean;
@@ -53,9 +63,13 @@ export type OwnProps = {
     isSilent?: boolean,
     shouldSchedule?: boolean,
     shouldPreserveInput?: boolean,
-    canUpdateStickerSetsOrder?: boolean,
+    canUpdateStickerSetsOrder?: boolean
   ) => void;
-  onGifSelect?: (gif: ApiVideo, isSilent?: boolean, shouldSchedule?: boolean) => void;
+  onGifSelect?: (
+    gif: ApiVideo,
+    isSilent?: boolean,
+    shouldSchedule?: boolean
+  ) => void;
   onRemoveSymbol: () => void;
   onSearchOpen: (type: 'stickers' | 'gifs') => void;
   addRecentEmoji: GlobalActions['addRecentEmoji'];
@@ -63,8 +77,7 @@ export type OwnProps = {
   className?: string;
   isAttachmentModal?: boolean;
   canSendPlainText?: boolean;
-}
-& MenuPositionOptions;
+} & MenuPositionOptions;
 
 type StateProps = {
   isLeftColumnShown: boolean;
@@ -103,8 +116,18 @@ const SymbolMenu: FC<OwnProps & StateProps> = ({
   const [recentCustomEmojis, setRecentCustomEmojis] = useState<string[]>([]);
   const { isMobile } = useAppLayout();
 
-  const [handleMouseEnter, handleMouseLeave] = useMouseInside(isOpen, onClose, undefined, isMobile);
-  const { shouldRender, transitionClassNames } = useShowTransitionDeprecated(isOpen, onClose, false, false);
+  const [handleMouseEnter, handleMouseLeave] = useMouseInside(
+    isOpen,
+    onClose,
+    undefined,
+    isMobile,
+  );
+  const { shouldRender, transitionClassNames } = useShowTransitionDeprecated(
+    isOpen,
+    onClose,
+    false,
+    false,
+  );
 
   const lang = useOldLang();
 
@@ -188,11 +211,22 @@ const SymbolMenu: FC<OwnProps & StateProps> = ({
     onSearchOpen(type);
   });
 
-  const handleStickerSelect = useLastCallback((
-    sticker: ApiSticker, isSilent?: boolean, shouldSchedule?: boolean, canUpdateStickerSetsOrder?: boolean,
-  ) => {
-    onStickerSelect?.(sticker, isSilent, shouldSchedule, true, canUpdateStickerSetsOrder);
-  });
+  const handleStickerSelect = useLastCallback(
+    (
+      sticker: ApiSticker,
+      isSilent?: boolean,
+      shouldSchedule?: boolean,
+      canUpdateStickerSetsOrder?: boolean,
+    ) => {
+      onStickerSelect?.(
+        sticker,
+        isSilent,
+        shouldSchedule,
+        true,
+        canUpdateStickerSetsOrder,
+      );
+    },
+  );
 
   function renderContent(isActive: boolean, isFrom: boolean) {
     switch (activeTab) {
@@ -216,20 +250,25 @@ const SymbolMenu: FC<OwnProps & StateProps> = ({
           />
         );
       case SymbolMenuTabs.Stickers:
-        return (
-          <StickerPicker
-            className="picker-tab"
-            isHidden={!isOpen || !isActive}
-            loadAndPlay={canSendStickers ? isOpen && (isActive || isFrom) : false}
-            idPrefix={idPrefix}
-            canSendStickers={canSendStickers}
-            noContextMenus={!isMessageComposer}
-            chatId={chatId}
-            threadId={threadId}
-            isTranslucent={!isMobile && isBackgroundTranslucent}
-            onStickerSelect={handleStickerSelect}
-          />
-        );
+        if (chatId) {
+          return (
+            <StickerPicker
+              className="picker-tab"
+              isHidden={!isOpen || !isActive}
+              loadAndPlay={
+                canSendStickers ? isOpen && (isActive || isFrom) : false
+              }
+              idPrefix={idPrefix}
+              canSendStickers={canSendStickers}
+              noContextMenus={!isMessageComposer}
+              chatId={chatId}
+              threadId={threadId}
+              isTranslucent={!isMobile && isBackgroundTranslucent}
+              onStickerSelect={handleStickerSelect}
+            />
+          );
+        }
+        break;
       case SymbolMenuTabs.GIFs:
         return (
           <GifPicker
@@ -300,18 +339,12 @@ const SymbolMenu: FC<OwnProps & StateProps> = ({
     );
 
     if (isAttachmentModal) {
-      return (
-        <div className={mobileClassName}>
-          {content}
-        </div>
-      );
+      return <div className={mobileClassName}>{content}</div>;
     }
 
     return (
       <Portal>
-        <div className={mobileClassName}>
-          {content}
-        </div>
+        <div className={mobileClassName}>{content}</div>
       </Portal>
     );
   }
@@ -328,21 +361,23 @@ const SymbolMenu: FC<OwnProps & StateProps> = ({
       noCloseOnBackdrop={!IS_TOUCH_ENV}
       noCompact
       // eslint-disable-next-line react/jsx-props-no-spreading
-      {...(isAttachmentModal ? menuPositionOptions : {
-        positionX: 'left',
-        positionY: 'bottom',
-      })}
+      {...(isAttachmentModal
+        ? menuPositionOptions
+        : {
+          positionX: 'left',
+          positionY: 'bottom',
+        })}
     >
       {content}
     </Menu>
   );
 };
 
-export default memo(withGlobal<OwnProps>(
-  (global): StateProps => {
+export default memo(
+  withGlobal<OwnProps>((global): StateProps => {
     return {
       isLeftColumnShown: selectTabState(global).isLeftColumnShown,
       isBackgroundTranslucent: selectIsContextMenuTranslucent(global),
     };
-  },
-)(SymbolMenu));
+  })(SymbolMenu),
+);

@@ -20,7 +20,7 @@ import SymbolMenu from './SymbolMenu.async';
 const MOBILE_KEYBOARD_HIDE_DELAY_MS = 100;
 
 type OwnProps = {
-  chatId: string;
+  chatId?: string;
   threadId?: ThreadId;
   isMobile?: boolean;
   isReady?: boolean;
