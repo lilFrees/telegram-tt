@@ -37,15 +37,21 @@
     color: var(--color-primary);
 
     .badge {
-      background: var(--color-primary);
+      background: var(--color-primary) !important;
     }
   }
 
-  &--icon {
+  &--default-icon {
     font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
   }
 
-  .Tab_inner {
+  &--icon {
+    font-size: 1.7rem;
+  }
+
+  &_inner {
     position: relative;
     display: flex;
     flex-direction: column;

@@ -35,6 +35,7 @@ export type TabWithProperties = {
   isBlocked?: boolean;
   isBadgeActive?: boolean;
   contextActions?: MenuItemContextAction[];
+  emoticon?: string;
 };
 
 type OwnProps = {
@@ -119,6 +120,7 @@ const TabList: FC<OwnProps> = ({
           key={tab.id}
           title={tab.title}
           isActive={i === activeTab}
+          icon={tab.emoticon}
           isBlocked={tab.isBlocked}
           badgeCount={tab.badgeCount}
           isBadgeActive={tab.isBadgeActive}

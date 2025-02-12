@@ -99,6 +99,10 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
 
   const [isIncludedChatsListExpanded, setIsIncludedChatsListExpanded] = useState(false);
   const [isExcludedChatsListExpanded, setIsExcludedChatsListExpanded] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(
+    false,
+    'emojiPicker',
+  );
 
   useEffect(() => {
     if (isRemoved) {
@@ -317,6 +321,10 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
     );
   }
 
+  function handleEmoticonChange(emoji: string) {
+    dispatch({ type: 'setEmoticon', payload: emoji });
+  }
+
   return (
     <div className="settings-fab-wrapper">
       <div className="settings-content no-border custom-scroll">
@@ -349,20 +357,22 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
                   : undefined
               }
             />
-            <button className="settings-item-input-toggle">
+            <button
+              className="settings-item-input-toggle"
+              onMouseEnter={() => setIsEmojiPickerOpen(true)}
+              onClick={() => setIsEmojiPickerOpen(true)}
+            >
               {Icon({ name: 'folder-badge' })}
             </button>
           </div>
         </div>
         <div className="SymbolMenu-main">
-          {(true || true) && (
-            <Transition
-              activeKey={2}
-              name="slide"
-            >
+          {isEmojiPickerOpen && (
+            <Transition activeKey={2} name="slide">
               <EmojiPicker
                 className="picker-tab"
-                onEmojiSelect={(_emoji, _name) => {}}
+                // eslint-disable-next-line react/jsx-no-bind
+                onEmojiSelect={handleEmoticonChange}
               />
             </Transition>
           )}

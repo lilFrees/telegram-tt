@@ -243,6 +243,7 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
         isBadgeActive: Boolean(folderCountersById[id]?.notificationsCount),
         isBlocked,
         contextActions: contextActions?.length ? contextActions : undefined,
+        emoticon: folder.emoticon,
       } satisfies TabWithProperties;
     });
   }, [
@@ -255,6 +256,8 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
     folderInvitesById,
     maxFolderInvites,
   ]);
+
+  console.log(folderTabs, 'folderTabs');
 
   const handleSwitchTab = useLastCallback((index: number) => {
     setActiveChatFolder(

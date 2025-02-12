@@ -31,6 +31,7 @@ type OwnProps = {
   clickArg?: number;
   contextActions?: MenuItemContextAction[];
   contextRootElementSelector?: string;
+  icon?: string;
 };
 
 const classNames = {
@@ -49,6 +50,7 @@ const Tab: FC<OwnProps> = ({
   clickArg,
   contextActions,
   contextRootElementSelector,
+  icon,
 }) => {
   // eslint-disable-next-line no-null/no-null
   const tabRef = useRef<HTMLDivElement>(null);
@@ -112,8 +114,10 @@ const Tab: FC<OwnProps> = ({
             {badgeCount}
           </span>
         )}
-        {contextRootElementSelector === '#LeftColumn' && (
-          <Icon name="folder-badge" className="Tab--icon" />
+        {contextRootElementSelector === '#LeftColumn' && !icon ? (
+          <Icon name="folder-badge" className="Tab--default-icon" />
+        ) : (
+          <div className="Tab--icon">{icon}</div>
         )}
         {typeof title === 'string' ? renderText(title) : title}
         {isBlocked && <Icon name="lock-badge" className="blocked" />}
