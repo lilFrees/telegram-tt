@@ -39,8 +39,8 @@ import useLastCallback from '../../../hooks/useLastCallback';
 import useShowTransition from '../../../hooks/useShowTransition';
 
 import StoryRibbon from '../../story/StoryRibbon';
-import TabList from '../../ui/TabList';
 import Transition from '../../ui/Transition';
+import VerticalTablist from '../../ui/VerticalTablist';
 import ChatList from './ChatList';
 
 type OwnProps = {
@@ -257,8 +257,6 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
     maxFolderInvites,
   ]);
 
-  console.log(folderTabs, 'folderTabs');
-
   const handleSwitchTab = useLastCallback((index: number) => {
     setActiveChatFolder(
       { activeChatFolder: index },
@@ -406,7 +404,7 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
         <StoryRibbon isClosing={isStoryRibbonClosing} />
       )}
       {shouldRenderFolders ? (
-        <TabList
+        <VerticalTablist
           contextRootElementSelector="#LeftColumn"
           tabs={folderTabs}
           activeTab={activeChatFolder}

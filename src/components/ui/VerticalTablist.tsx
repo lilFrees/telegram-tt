@@ -1,22 +1,15 @@
 // import { useMemo } from 'react';
 import type { FC, TeactNode } from '../../lib/teact/teact';
-import React, {
-  memo, useEffect,
-  useRef,
-} from '../../lib/teact/teact';
+import React, { memo, useEffect, useRef } from '../../lib/teact/teact';
 
 import type { LeftColumnContent } from '../../types';
 import type { MenuItemContextAction } from './ListItem';
 
-import animateHorizontalScroll from '../../util/animateHorizontalScroll';
+import animateScroll from '../../util/animateScroll';
 import buildClassName from '../../util/buildClassName';
-import {
-  IS_ANDROID,
-  IS_IOS,
-} from '../../util/windowEnvironment';
 
+// import useTopOverscroll from '../../hooks/scroll/useTopOverscroll';
 import useAppLayout from '../../hooks/useAppLayout';
-import useHorizontalScroll from '../../hooks/useHorizontalScroll';
 // import useTopOverscroll from '../../hooks/scroll/useTopOverscroll';
 // import useAppLayout from '../../hooks/useAppLayout';
 // import useHorizontalScroll from '../../hooks/useHorizontalScroll';
@@ -26,7 +19,7 @@ import usePreviousDeprecated from '../../hooks/usePreviousDeprecated';
 // import Button from './Button';
 import Tab from './Tab';
 
-import './TabList.scss';
+import './VerticalTablist.scss';
 
 export type TabWithProperties = {
   id?: number;
@@ -56,9 +49,8 @@ type OwnProps = {
 
 const TAB_SCROLL_THRESHOLD_PX = 16;
 // Should match duration from `--slide-transition` CSS variable
-const SCROLL_DURATION = IS_IOS ? 450 : IS_ANDROID ? 400 : 300;
 
-const TabList: FC<OwnProps> = ({
+const VerticalTabList: FC<OwnProps> = ({
   tabs,
   activeTab,
   onSwitchTab,
@@ -76,42 +68,47 @@ const TabList: FC<OwnProps> = ({
   // const { isMobile } = useAppLayout();
   const lang = useOldLang();
 
-  useHorizontalScroll(containerRef, undefined, true);
+  // useTopOverscroll(containerRef, undefined, undefined, true);
 
   // Scroll container to place active tab in the center
-  useEffect(() => {
-    const container = containerRef.current!;
-    const { scrollWidth, offsetWidth, scrollLeft } = container;
-    if (scrollWidth <= offsetWidth) {
-      return;
-    }
+  // useEffect(() => {
+  //   const container = containerRef.current!;
+  //   const { scrollHeight, offsetHeight, scrollTop } = container;
+  //   if (scrollHeight <= offsetHeight) {
+  //     return;
+  //   }
 
-    const activeTabElement = container.childNodes[
-      activeTab
-    ] as HTMLElement | null;
-    if (!activeTabElement) {
-      return;
-    }
+  //   const activeTabElement = container.childNodes[
+  //     activeTab
+  //   ] as HTMLElement | null;
+  //   if (!activeTabElement) {
+  //     return;
+  //   }
 
-    const {
-      offsetLeft: activeTabOffsetLeft,
-      offsetWidth: activeTabOffsetWidth,
-    } = activeTabElement;
-    const newLeft = activeTabOffsetLeft - offsetWidth / 2 + activeTabOffsetWidth / 2;
+  //   const {
+  //     offsetLeft: activeTabOffsetLeft,
+  //     offsetHeight: activeTabOffsetHeight,
+  //   } = activeTabElement;
+  //   const newLeft = activeTabOffsetLeft - offsetHeight / 2 + activeTabOffsetHeight / 2;
 
-    // Prevent scrolling by only a couple of pixels, which doesn't look smooth
-    if (Math.abs(newLeft - scrollLeft) < TAB_SCROLL_THRESHOLD_PX) {
-      return;
-    }
+  //   // Prevent scrolling by only a couple of pixels, which doesn't look smooth
+  //   if (Math.abs(newLeft - scrollTop) < TAB_SCROLL_THRESHOLD_PX) {
+  //     return;
+  //   }
 
-    animateHorizontalScroll(container, newLeft, SCROLL_DURATION);
-  }, [activeTab]);
+  //   animateScroll({ container, element: activeTabElement, position: 'center' });
+  // }, [activeTab]);
 
   const { isMobile } = useAppLayout();
 
   return (
     <div
-      className={buildClassName('TabList', 'no-scrollbar', className, isMobile && 'mobile')}
+      className={buildClassName(
+        'VerticalTablist',
+        'no-scrollbar',
+        className,
+        isMobile && 'mobile',
+      )}
       ref={containerRef}
       dir={lang.isRtl ? 'rtl' : undefined}
     >
@@ -136,4 +133,4 @@ const TabList: FC<OwnProps> = ({
   );
 };
 
-export default memo(TabList);
+export default memo(VerticalTabList);
