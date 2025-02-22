@@ -45,9 +45,31 @@
   &-main {
     height: calc(var(--symbol-menu-height) - var(--symbol-menu-footer-height));
     max-height: calc(100vh - var(--symbol-menu-footer-height));
+    position: relative;
 
     @media (max-width: 600px) {
-      max-height: calc(100vh - var(--symbol-menu-footer-height) - env(safe-area-inset-bottom));
+      max-height: calc(
+        100vh - var(--symbol-menu-footer-height) - env(safe-area-inset-bottom)
+      );
+    }
+
+    &--folder-edit {
+      position: absolute;
+      right: 0;
+      border-radius: 20px;
+      z-index: 5;
+      height: calc(
+        var(--symbol-menu-height) - var(--symbol-menu-footer-height)
+      );
+      max-height: calc(100vh - var(--symbol-menu-footer-height));
+    }
+
+    &--backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 130%;
+      height: 100px;
     }
   }
 
@@ -148,7 +170,8 @@
     transition-duration: 200ms !important;
   }
 
-  .StickerButton.custom-emoji, .sticker-set-cover {
+  .StickerButton.custom-emoji,
+  .sticker-set-cover {
     color: var(--color-text);
   }
 

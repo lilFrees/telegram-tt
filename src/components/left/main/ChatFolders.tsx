@@ -257,6 +257,8 @@ const ChatFolders: FC<OwnProps & StateProps> = ({
     maxFolderInvites,
   ]);
 
+  console.log(folderTabs, 'folderTabs');
+
   const handleSwitchTab = useLastCallback((index: number) => {
     setActiveChatFolder(
       { activeChatFolder: index },

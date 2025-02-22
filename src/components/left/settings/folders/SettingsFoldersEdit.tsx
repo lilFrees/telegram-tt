@@ -1,9 +1,11 @@
+/* eslint-disable no-null/no-null */
 import type { FC } from '../../../../lib/teact/teact';
 import React, {
   memo,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from '../../../../lib/teact/teact';
 import { getActions, getGlobal, withGlobal } from '../../../../global';
@@ -103,6 +105,8 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
     false,
     'emojiPicker',
   );
+  const invisibleRef = useRef<HTMLDivElement | null>(null);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isRemoved) {
@@ -321,6 +325,17 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
     );
   }
 
+  function handleMouseLeave(e: React.MouseEvent<HTMLDivElement>) {
+    if (
+      emojiRef.current
+      && invisibleRef.current
+      && !emojiRef.current.contains(e.relatedTarget as Node)
+      && !invisibleRef.current.contains(e.relatedTarget as Node)
+    ) {
+      setIsEmojiPickerOpen(false);
+    }
+  }
+
   function handleEmoticonChange(emoji: string) {
     dispatch({ type: 'setEmoticon', payload: emoji });
   }
@@ -360,22 +375,34 @@ const SettingsFoldersEdit: FC<OwnProps & StateProps> = ({
             <button
               className="settings-item-input-toggle"
               onMouseEnter={() => setIsEmojiPickerOpen(true)}
-              onClick={() => setIsEmojiPickerOpen(true)}
             >
+              <div
+                ref={invisibleRef}
+                className="SymbolMenu-main--backdrop"
+                onMouseEnter={() => setIsEmojiPickerOpen(true)}
+                onMouseLeave={handleMouseLeave}
+              />
               {Icon({ name: 'folder-badge' })}
             </button>
           </div>
         </div>
-        <div className="SymbolMenu-main">
-          {isEmojiPickerOpen && (
-            <Transition activeKey={2} name="slide">
-              <EmojiPicker
-                className="picker-tab"
-                // eslint-disable-next-line react/jsx-no-bind
-                onEmojiSelect={handleEmoticonChange}
-              />
-            </Transition>
-          )}
+        <div className="SymbolMenu">
+          <div
+            className="SymbolMenu-main--folder-edit"
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="SymbolMenu-main" ref={emojiRef}>
+              {isEmojiPickerOpen && (
+                <Transition activeKey={2} name="slide">
+                  <EmojiPicker
+                    className="picker-tab"
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onEmojiSelect={handleEmoticonChange}
+                  />
+                </Transition>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* <EmojiTooltipAsync isOpen customEmojis={} /> */}

@@ -71,33 +71,33 @@ const VerticalTabList: FC<OwnProps> = ({
   // useTopOverscroll(containerRef, undefined, undefined, true);
 
   // Scroll container to place active tab in the center
-  // useEffect(() => {
-  //   const container = containerRef.current!;
-  //   const { scrollHeight, offsetHeight, scrollTop } = container;
-  //   if (scrollHeight <= offsetHeight) {
-  //     return;
-  //   }
+  useEffect(() => {
+    const container = containerRef.current!;
+    const { scrollHeight, offsetHeight, scrollTop } = container;
+    if (scrollHeight <= offsetHeight) {
+      return;
+    }
 
-  //   const activeTabElement = container.childNodes[
-  //     activeTab
-  //   ] as HTMLElement | null;
-  //   if (!activeTabElement) {
-  //     return;
-  //   }
+    const activeTabElement = container.childNodes[
+      activeTab
+    ] as HTMLElement | null;
+    if (!activeTabElement) {
+      return;
+    }
 
-  //   const {
-  //     offsetLeft: activeTabOffsetLeft,
-  //     offsetHeight: activeTabOffsetHeight,
-  //   } = activeTabElement;
-  //   const newLeft = activeTabOffsetLeft - offsetHeight / 2 + activeTabOffsetHeight / 2;
+    const {
+      offsetLeft: activeTabOffsetLeft,
+      offsetHeight: activeTabOffsetHeight,
+    } = activeTabElement;
+    const newLeft = activeTabOffsetLeft - offsetHeight / 2 + activeTabOffsetHeight / 2;
 
-  //   // Prevent scrolling by only a couple of pixels, which doesn't look smooth
-  //   if (Math.abs(newLeft - scrollTop) < TAB_SCROLL_THRESHOLD_PX) {
-  //     return;
-  //   }
+    // Prevent scrolling by only a couple of pixels, which doesn't look smooth
+    if (Math.abs(newLeft - scrollTop) < TAB_SCROLL_THRESHOLD_PX) {
+      return;
+    }
 
-  //   animateScroll({ container, element: activeTabElement, position: 'center' });
-  // }, [activeTab]);
+    animateScroll({ container, element: activeTabElement, position: 'center' });
+  }, [activeTab]);
 
   const { isMobile } = useAppLayout();
 
